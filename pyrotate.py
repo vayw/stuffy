@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from sys import exit as sexit
-import sys
+import os
+import shutil
 import datetime
 
 backup_dir = ""
@@ -27,7 +28,7 @@ def remove(fpath):
   if os.path.isfile(fpath):
     os.remove(fpath)
   elif os.path.isdir(fpath):
-    os.rmdir(fpath)
+    shutil.rmtree(fpath)
 
 # perform checks
 # denied paths
