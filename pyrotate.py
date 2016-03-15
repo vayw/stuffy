@@ -19,11 +19,6 @@ mothly_day = 1
 # time - by mtime attribute
 determine_type = "time"
 
-# type of backups
-# d - directories
-# f - any type of files
-backups = 'f'
-
 def remove(fpath):
   if os.path.isfile(fpath):
     os.remove(fpath)
@@ -53,14 +48,11 @@ for bkpfile in backups_list:
   mtime = datetime.datetime.fromtimestamp(mtime_stamp)
   # lookup for daily 
   if datetime.datetime.now() > mtime > daily:
-    #print("daily:", bkpfile)
     pass
   # lookup for weekly
   elif daily > mtime > weekly and mtime.day in weekly_days:
-    #print("weekly:", bkpfile)
     pass
   elif mtime.day == mothly_day:
-      #print("monthly:", bkpfile)
       pass
   else:
     remove(bkpfile)
