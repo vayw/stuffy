@@ -21,13 +21,39 @@ def get_ips(config_file):
         ips.append(r.group(2))
   return list(set(ips))
 
+def ip_search(config_file, config_files):
+  ips = []
+  simple_search = get_ips(config_file)
+  if len(simple_search) == 0:
+    # let's look for include statement with our config_file in
+    # config_files
+    for filename in config_files:
+      with open(filename, 'r') as f:
+        try:
+          conftxt = f.read()
+        except:
+          continue
+      server_block_open = False
+      include_found = False
+      for line in conftxt.split('\n'):
+        if re.search('\s*server\s+\{', line):
+          server_block_open = True
+          continue
+        elif config_file in line and server_block_open:
+          include_found = True
+        elif 'listen' in line:
+          if include_found:
+            
+      
+
 # get tuple server_name + domain name
 def get_server_name(config_file):
-  r = re.search('(server_name)\ +.*\ ([a-zA-Z0-9.-]{4,});', config_file)
+  r = re.search('(server_name)\ +(.*);', config_file)
+  names = r.group(2).split()
   if r:
-    return r.groups()
+    return names
   else:
-    return ('none', 'none')
+    return None
 
 def check_identity(domain_data, verbose=False):
   if len(domain_data[1]) == 0:
@@ -69,16 +95,25 @@ def main():
         conftxt = f.read()
       except:
         continue
+
     srv = get_server_name(conftxt)
-    if srv[0] == 'server_name':
-      domains_ips[srv[1]] = get_ips(conftxt)
+    if srv not None:
+      if len(srv) == 1:
+        domains_ips[srv[0]] = get_ips(conftxt)
+      elif len(srv) >= 2:
+        jips = get_ips(conftxt)
+        for i in srv:
+          domains_ips[i] = jips
 
   if len(domains_ips) == 0:
     print("no configuration found!")
     return 0
 
   if args.domain:
-    print(domains_ips[args.domain])
+    try:
+      print(domains_ips[args.domain])
+    except KeyError:
+      print(args.domain, "not found!"
   elif args.test is False:
     print(domains_ips)
 
